@@ -6,10 +6,11 @@ function App() {
   const [count, setCount] = useState(0)
 
   return (
-    <div className="App">
+    <div className="text-center min-w-[350px]">
       <header className="App-header">
-        <img src={chrome.runtime.getURL(logo)} className="App-logo" alt="logo" />
-        <p>Hello Vite + React!</p>
+        <img src={logo} className="App-logo" alt="logo" />
+      </header>
+      {/* <p>Hello Vite + React!</p>
         <p>
           <button type="button" onClick={() => setCount((count) => count + 1)}>
             count is: {count}
@@ -36,8 +37,7 @@ function App() {
           >
             Vite Docs
           </a>
-        </p>
-      </header>
+        </p> */}
     </div>
   )
 }
