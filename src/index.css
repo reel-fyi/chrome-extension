@@ -12,13 +12,6 @@ code {
     monospace;
 }
 
-/* #crx-root {
-  position: fixed;
-  top: 3rem;
-  left: 50%;
-  transform: translate(-50%, 0);
-} */
-
 #crx-root button {
   background-color: red;
   border-color: rgb(118, 118, 118);

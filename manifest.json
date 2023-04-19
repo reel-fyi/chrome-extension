@@ -6,7 +6,7 @@
   "content_scripts": [
     {
       "matches": ["*://*.reel.fyi/*"],
-      "js": ["src/content.tsx"]
+      "js": ["src/contentScripts/index.tsx"]
     }
   ]
 }
