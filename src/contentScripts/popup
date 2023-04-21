@@ -1,0 +1,59 @@
+<div id="ss-le" aria-hidden="true">
+  <div>
+    <div
+      id="le-move-box"
+      class="comment-box-wrapper"
+      style="visibility: visible; top: 202.984px; left: 557px"
+    >
+      <div class="comment-box-wrapper__header">
+        <div class="btn">MESSAGE OPTIONS</div>
+        <div class="btn text-underline" style="cursor: pointer">close</div>
+      </div>
+      <div class="comment-option" style="padding: 0px">
+        <div class="comment-option-item" style="opacity: 1; cursor: pointer">
+          <div class="comment-option-item-content">
+            <div class="comment-option-item-content__icon">
+              <img
+                src="https://sales-stack-chrome-extension-assets.s3.eu-west-2.amazonaws.com/le-magic.png"
+                alt="icon"
+              />
+            </div>
+            <div class="comment-option-item-content__text">Write a Message</div>
+          </div>
+        </div>
+        <div class="comment-option-item" style="opacity: 1; cursor: pointer">
+          <div class="comment-option-item-content">
+            <div class="comment-option-item-content__icon">
+              <img
+                src="https://sales-stack-chrome-extension-assets.s3.eu-west-2.amazonaws.com/le-dummy.png"
+                alt="icon"
+              />
+            </div>
+            <div class="comment-option-item-content__text">Your Intentions</div>
+          </div>
+          <div class="comment-option-item-caret">
+            <img
+              src="https://sales-stack-chrome-extension-assets.s3.eu-west-2.amazonaws.com/le-right-caret.png"
+              alt="icon"
+            />
+          </div>
+          <div class="comment-option-item-selected">
+            <div class="comment-option-item-selected-text">conneciton</div>
+            <div
+              class="comment-option-item-selected-text"
+              style="margin-top: 10px"
+            >
+              <div>
+                <img
+                  src="https://sales-stack-chrome-extension-assets.s3.eu-west-2.amazonaws.com/le-plus-sign.png"
+                />
+                Add New Intention
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="comment-option__expired-banner"></div>
+      </div>
+    </div>
+  </div>
+</div>
