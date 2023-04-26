@@ -8,7 +8,7 @@ function App() {
       <header className="min-h-[100vh] flex flex-col items-center p-2 gap-4">
         <div className='flex items-center self-start'>
           <img src={logo} className="h-10 w-10" alt="Reel.fyi logo" />
-          <h2 className='text-2xl font-semibold'>Reel.fyi</h2>
+          <h2 className='text-gray-800 text-2xl font-semibold'>Reel.fyi</h2>
         </div>
         <a href="https://reel.fyi"
           target='_blank'
