@@ -12,7 +12,7 @@ function renderApp(reactRoot: ReactDOM.Root, icon: HTMLImageElement) {
     <React.StrictMode>
       <div style={
         {
-          visibility: state.getAppVisible() ? 'visible' : 'hidden',
+          visibility: state.appVisible ? 'visible' : 'hidden',
           position: 'fixed',
           top: iconRect.top,
           left: iconRect.right,
@@ -43,8 +43,8 @@ function mountApp() {
   iconRoot.appendChild(icon);
 
   iconRoot.onclick = () => {
-    if (!state.getAppVisible()) {
-      state.setAppVisible(true);
+    if (!state.appVisible) {
+      state.appVisible = true;
     }
   }
   
@@ -84,6 +84,42 @@ if (addNoteBtn) {
     }
   });
   observer.observe(document.body, { childList: true, subtree: true });
+}
+
+// Get linkedin profile info
+const EXPERIENCE_QUERY = 'div#experience';
+const FIRST_EXPERIENCE_QUERY = 'div.pvs-list__outer-container > ul.pvs-list > li';
+const MANY_EXP_QUERY = 'span.pvs-entity__path-node';
+const NAME_QUERY = 'div.pv-text-details__left-panel > div > h1';
+
+// name
+const nameEl = document.querySelector<HTMLElement>(NAME_QUERY);
+if (nameEl) {
+  state.connectionName = nameEl.innerText;
+  console.log(state.connectionName);
+}
+
+// experience
+const expDiv = document.querySelector(EXPERIENCE_QUERY);
+if (expDiv) {
+  // has experiences
+  const expSec = expDiv.parentElement;
+  if (expSec) {
+    // cut off index from the text in the first experience
+    let idx = 2;
+    // check if there were many experiences at 1 company
+    if (expSec.querySelector(MANY_EXP_QUERY)) {
+      // the "timeline" effect on linkedin forces us to set this value to be at least 4
+      idx = 4;
+    }
+    const firstExp = expSec.querySelector<HTMLElement>(FIRST_EXPERIENCE_QUERY);
+    if (firstExp) {
+      const firstExpText = firstExp.outerText.split('\n');
+      const exp = Array.from(new Set(firstExpText)).slice(0, idx).join('\n');
+      state.connectionInfo = exp;
+      console.log(state.connectionInfo);
+    }
+  }
 }
 
 

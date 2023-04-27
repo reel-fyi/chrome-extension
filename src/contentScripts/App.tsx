@@ -34,7 +34,7 @@ function App() {
             <img src={chrome.runtime.getURL(logo)} className="h-10 w-10" alt="Reel.fyi logo" />
             <h2 className='text-gray-800 text-2xl font-semibold'>Reel.fyi</h2>
           </div>
-          <button className='text-2xl' onClick={() => state.setAppVisible(false)}>
+          <button className='text-2xl' onClick={() => state.appVisible = false}>
             <AiOutlineClose className='fill-gray-800' />
           </button>
         </div>
