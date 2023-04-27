@@ -1,11 +1,21 @@
 const APP_VISIBLE_EVENT_NAME = 'appVisible';
 
+type UserData = {
+    bio: string;
+    email: string;
+    id: string;
+    name: string;
+    username: string;
+    token: string;
+}
 class State {
     private _appVisible: boolean;
     private _appVisibleEvent: Event;
 
     private _connectionName: string | undefined;
     private _connectionInfo: string;
+
+    private _userData: UserData | undefined;
 
     events = {
         appVisible: APP_VISIBLE_EVENT_NAME,
@@ -17,6 +27,8 @@ class State {
         
         this._connectionName = undefined;
         this._connectionInfo = "";
+
+        this._userData = undefined;
     }
 
     public get appVisible(): boolean {
@@ -42,6 +54,14 @@ class State {
 
     public set connectionName(name: string | undefined) {
         this._connectionName = name;
+    }
+
+    public get userData(): UserData | undefined {
+        return this._userData;
+    }
+
+    public set userData(data: UserData | undefined) {
+        this._userData = data;
     }
 }
 

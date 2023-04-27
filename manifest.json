@@ -6,7 +6,11 @@
   "content_scripts": [
     {
       "matches": ["*://*.linkedin.com/*"],
-      "js": ["src/contentScripts/index.tsx"]
+      "js": ["src/contentScripts/linkedin/index.tsx"]
+    },
+    {
+      "matches": ["*://*.reel.fyi/*"],
+      "js": ["src/contentScripts/reel/index.tsx"]
     }
   ],
   "icons": {
@@ -15,6 +19,9 @@
     "48": "icons/icon48.png",
     "128": "icons/icon128.png"
   },
-  "permissions": ["activeTab", "scripting", "clipboardWrite"],
-  "host_permissions": ["*://*.linkedin.com/*"]
+  "permissions": ["activeTab", "scripting", "clipboardWrite", "storage"],
+  "host_permissions": ["*://*.linkedin.com/*", "*://*.reel.fyi/*"],
+  "externally_connectable": {
+    "matches": ["*://*.reel.fyi/*"]
+  }
 }

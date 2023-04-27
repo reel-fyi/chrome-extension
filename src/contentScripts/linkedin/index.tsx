@@ -1,9 +1,11 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import App from './App'
-import '../index.css'
-import logo from '../media/logo.svg';
-import state from './state';
+import '../../index.css'
+import logo from '../../media/logo.svg';
+import state from '../state';
+
+type UserData = typeof state.userData;
 
 function renderApp(reactRoot: ReactDOM.Root, icon: HTMLImageElement) {
   const iconRect = icon.getBoundingClientRect();
@@ -47,7 +49,7 @@ function mountApp() {
       state.appVisible = true;
     }
   }
-  
+
   const textareaElement = document.querySelector<HTMLElement>('textarea');
   textareaElement?.parentElement?.appendChild(iconRoot);
   document.addEventListener(state.events.appVisible, () => {
@@ -122,6 +124,14 @@ if (expDiv) {
   }
 }
 
+// get user data from extension storage
+(async () => {
+  if (!state.userData) {
+    const localData = await chrome.storage.local.get('userData');
+    state.userData = localData.userData as UserData;
+  }
+  console.log(state.userData);
+})();
 
 // Clean up some styles on the page, because tailwind messes them up a bit
 const FOLLOW_BTN_QUERY = 'div.pvs-profile-actions > button.pvs-profile-actions__action';
@@ -129,3 +139,6 @@ const followBtn = document.querySelector<HTMLElement>(FOLLOW_BTN_QUERY);
 if (followBtn) {
   followBtn.style.backgroundColor = 'var(--voyager-color-action)';
 }
+
+// Linkedin hydrates the page with new content, it does not reload the page. Script injected only once
+// workaround is to listen for the page to change url (if possible), then re-inject the script

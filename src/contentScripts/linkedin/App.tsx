@@ -1,9 +1,9 @@
 import { useState } from 'react';
-import logo from '../media/logo.svg';
 import { Badge, Button } from 'flowbite-react';
 import { AiOutlineClose } from 'react-icons/ai';
 import { clipboard } from '@extend-chrome/clipboard'
-import state from './state';
+import logo from '../../media/logo.svg';
+import state from '../state';
 
 const DEFAULT_MESSAGE = "Hi Zeyao, as an IU alum like yourself, I'm excited to connect with you. I'm Dake, a junior at IU and an incoming Microsoft PM intern. With my experience at a Techstars company, I'm interested in discussing product at Google and learning about your journey. Let's chat!"
 
