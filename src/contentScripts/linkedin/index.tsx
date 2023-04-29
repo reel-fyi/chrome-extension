@@ -6,6 +6,7 @@ import logo from '../../media/logo.svg';
 import state from '../state';
 
 type UserData = typeof state.userData;
+const profilePageExp = /^\/in\//;
 
 function renderApp(reactRoot: ReactDOM.Root, icon: HTMLImageElement) {
   const iconRect = icon.getBoundingClientRect();
@@ -64,81 +65,122 @@ function mountApp() {
   }
 }
 
-const ADD_NOTE_BTN_QUERY = 'button[aria-label="Add a note"]';
-const addNoteBtn = document.querySelector(ADD_NOTE_BTN_QUERY);
+function observeConnectionMsg() {
+  const ADD_NOTE_BTN_QUERY = 'button[aria-label="Add a note"]';
+  const addNoteBtn = document.querySelector(ADD_NOTE_BTN_QUERY);
 
-if (addNoteBtn) {
-  console.log('addNoteBtn found');
-  addNoteBtn.addEventListener('click', () => {
-    console.log("Add a note button clicked");
-    mountApp();
-  });
-} else {
-  const observer = new MutationObserver(() => {
-    const btn = document.querySelector(ADD_NOTE_BTN_QUERY);
-    if (btn) {
-      // figure out how to get icon to show up again after this observer disconnects
-      observer.disconnect();
-      btn.addEventListener('click', () => {
-        console.log("Add a note button clicked");
-        mountApp();
-      });
-    }
-  });
-  observer.observe(document.body, { childList: true, subtree: true });
+  if (addNoteBtn) {
+    console.log('addNoteBtn found');
+    addNoteBtn.addEventListener('click', () => {
+      console.log("Add a note button clicked");
+      mountApp();
+    });
+  } else {
+    const observer = new MutationObserver(() => {
+      const btn = document.querySelector(ADD_NOTE_BTN_QUERY);
+      if (btn) {
+        // figure out how to get icon to show up again after this observer disconnects
+        observer.disconnect();
+        btn.addEventListener('click', () => {
+          console.log("Add a note button clicked");
+          mountApp();
+        });
+      }
+    });
+    observer.observe(document.body, { childList: true, subtree: true });
+  }
 }
 
-// Get linkedin profile info
-const EXPERIENCE_QUERY = 'div#experience';
-const FIRST_EXPERIENCE_QUERY = 'div.pvs-list__outer-container > ul.pvs-list > li';
-const MANY_EXP_QUERY = 'span.pvs-entity__path-node';
-const NAME_QUERY = 'div.pv-text-details__left-panel > div > h1';
+function getProfileInfo() {
+  // Get linkedin profile info
+  const EXPERIENCE_QUERY = 'div#experience';
+  const FIRST_EXPERIENCE_QUERY = 'div.pvs-list__outer-container > ul.pvs-list > li';
+  const MANY_EXP_QUERY = 'span.pvs-entity__path-node';
+  const NAME_QUERY = 'div.pv-text-details__left-panel > div > h1';
 
-// name
-const nameEl = document.querySelector<HTMLElement>(NAME_QUERY);
-if (nameEl) {
-  state.connectionName = nameEl.innerText;
-  console.log(state.connectionName);
-}
+  // name
+  const nameEl = document.querySelector<HTMLElement>(NAME_QUERY);
+  if (nameEl) {
+    state.connectionName = nameEl.innerText;
+    console.log(state.connectionName);
+  }
 
-// experience
-const expDiv = document.querySelector(EXPERIENCE_QUERY);
-if (expDiv) {
-  // has experiences
-  const expSec = expDiv.parentElement;
-  if (expSec) {
-    // cut off index from the text in the first experience
-    let idx = 2;
-    // check if there were many experiences at 1 company
-    if (expSec.querySelector(MANY_EXP_QUERY)) {
-      // the "timeline" effect on linkedin forces us to set this value to be at least 4
-      idx = 4;
-    }
-    const firstExp = expSec.querySelector<HTMLElement>(FIRST_EXPERIENCE_QUERY);
-    if (firstExp) {
-      const firstExpText = firstExp.outerText.split('\n');
-      const exp = Array.from(new Set(firstExpText)).slice(0, idx).join('\n');
-      state.connectionInfo = exp;
-      console.log(state.connectionInfo);
+  // experience
+  const expDiv = document.querySelector(EXPERIENCE_QUERY);
+  if (expDiv) {
+    // has experiences
+    const expSec = expDiv.parentElement;
+    if (expSec) {
+      // cut off index from the text in the first experience
+      let idx = 2;
+      // check if there were many experiences at 1 company
+      if (expSec.querySelector(MANY_EXP_QUERY)) {
+        // the "timeline" effect on linkedin forces us to set this value to be at least 4
+        idx = 4;
+      }
+      const firstExp = expSec.querySelector<HTMLElement>(FIRST_EXPERIENCE_QUERY);
+      if (firstExp) {
+        const firstExpText = firstExp.outerText.split('\n');
+        const exp = Array.from(new Set(firstExpText)).slice(0, idx).join('\n');
+        state.connectionInfo = exp;
+        console.log(state.connectionInfo);
+      }
     }
   }
 }
 
-// get user data from extension storage
-(async () => {
+async function getUserDataFromStorage() {
+  // get user data from extension storage
   if (!state.userData) {
     const localData = await chrome.storage.local.get('userData');
     state.userData = localData.userData as UserData;
   }
   console.log(state.userData);
-})();
-
-// Clean up some styles on the page, because tailwind messes them up a bit
-const FOLLOW_BTN_QUERY = 'div.pvs-profile-actions > button.pvs-profile-actions__action';
-const followBtn = document.querySelector<HTMLElement>(FOLLOW_BTN_QUERY);
-if (followBtn) {
-  followBtn.style.backgroundColor = 'var(--voyager-color-action)';
 }
 
-// Linkedin hydrates the page with new content, it does not reload the page. Script injected only once
-// workaround is to listen for the page to change url (if possible), then re-inject the script
+function cleanUpUI() {
+  // Clean up some styles on the page, because tailwind messes them up a bit
+  const isDarkMode = document.querySelector('.theme--dark') !== null;
+  const PRIMARY_BTN_QUERY = '.artdeco-button--primary';
+  const primaryBtns = document.querySelectorAll<HTMLElement>(PRIMARY_BTN_QUERY);
+  primaryBtns.forEach(btn => {
+    if (isDarkMode) {
+      btn.style.backgroundColor = 'var(--voyager-color-action)';
+    }
+  });
+
+  const SEARCH_ICON_QUERY = '.search-global-typeahead__search-icon';
+  const searchIcon = document.querySelector<HTMLElement>(SEARCH_ICON_QUERY);
+  if (searchIcon) {
+    searchIcon.style.backgroundColor = 'transparent';
+    searchIcon.style.border = 'none';
+    searchIcon.style.padding = '0';
+  }
+}
+
+function onLinkedInProfile() {
+  // check if current url is on a linkedin profile page
+  return profilePageExp.test(window.location.pathname);
+}
+
+function runScript() {
+  if (onLinkedInProfile()) {
+    getUserDataFromStorage();
+    getProfileInfo();
+    observeConnectionMsg();
+  }
+  cleanUpUI();
+}
+
+const observeUrlChange = () => {
+  let oldPathname = window.location.pathname;
+  const observer = new MutationObserver(() => {
+    if (oldPathname !== window.location.pathname) {
+      oldPathname = window.location.pathname;
+      runScript();
+    }
+  });
+  observer.observe(document.body, { childList: true, subtree: true });
+}
+observeUrlChange();
+runScript();
