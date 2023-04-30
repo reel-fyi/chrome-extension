@@ -172,15 +172,18 @@ function runScript() {
   cleanUpUI();
 }
 
-const observeUrlChange = () => {
+const observePage = () => {
   let oldPathname = window.location.pathname;
   const observer = new MutationObserver(() => {
     if (oldPathname !== window.location.pathname) {
       oldPathname = window.location.pathname;
       runScript();
+    } else {
+      cleanUpUI();
     }
   });
   observer.observe(document.body, { childList: true, subtree: true });
 }
-observeUrlChange();
+
 runScript();
+observePage();
