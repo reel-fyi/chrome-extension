@@ -9,13 +9,10 @@ const DEFAULT_MESSAGE = "Hi Zeyao, as an IU alum like yourself, I'm excited to c
 
 function App() {
   const [message, setMessage] = useState(DEFAULT_MESSAGE);
-  const [messageCopied, setMessageCopied] = useState(true);
+  const [messageCopied, setMessageCopied] = useState(false);
 
   const copyText = async () => {
-    const copied = await clipboard.writeText(message);
-    if (copied === message) {
-      setMessageCopied(true);
-    }
+    await navigator.clipboard.writeText(message);
   }
 
   const copyMessageBadge = (
@@ -44,11 +41,11 @@ function App() {
         </div>
         <div className="bg-gray-200 rounded-lg p-3">
           <p className='text-lg text-gray-700'>
-            Hi Zeyao, as an IU alum like yourself, I'm excited to connect with you. I'm Dake, a junior at IU and an incoming Microsoft PM intern. With my experience at a Techstars company, I'm interested in discussing product at Google and learning about your journey. Let's chat!
+            {message}
           </p>
         </div>
         <div className='flex justify-between flex-grow mt-2 gap-x-8'>
-          <Button color="purple" fullSized>
+          <Button color="purple" fullSized onClick={copyText}>
             <span className="flex items-center rounded-md text-lg px-6 py-1">
               Copy Text
             </span>
