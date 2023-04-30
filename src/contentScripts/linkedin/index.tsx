@@ -7,6 +7,7 @@ import state from '../state';
 
 type UserData = typeof state.userData;
 const profilePageExp = /^\/in\//;
+let reactRoot: ReactDOM.Root;
 
 function renderApp(reactRoot: ReactDOM.Root, icon: HTMLImageElement) {
   const iconRect = icon.getBoundingClientRect();
@@ -59,8 +60,8 @@ function mountApp() {
     root = document.createElement('div');
     root.id = "crx-root";
     document.body.appendChild(root);
+    reactRoot = ReactDOM.createRoot(root);
   }
-  const reactRoot = ReactDOM.createRoot(root);
   document.addEventListener(state.events.appVisible, () => {
     renderApp(reactRoot, icon);
   });
@@ -83,6 +84,7 @@ function observeConnectionMsg() {
 
   function onMutation() {
     const btn = document.querySelector(ADD_NOTE_BTN_QUERY);
+    const reelIcon = document.getElementById('crx-icon-root');
     if (btn) {
       observer.disconnect();
       console.log('addNoteBtn found');
@@ -91,6 +93,10 @@ function observeConnectionMsg() {
         mountApp();
       });
       observe();
+    }
+
+    if (reelIcon === null && state.appVisible) {
+      state.appVisible = false;
     }
   }
 
