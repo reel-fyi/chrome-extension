@@ -29,11 +29,6 @@ function renderApp(reactRoot: ReactDOM.Root, icon: HTMLImageElement) {
 }
 
 function mountApp() {
-  const root = document.createElement('div');
-  root.id = "crx-root";
-  document.body.appendChild(root);
-  const reactRoot = ReactDOM.createRoot(root);
-
   const iconRoot = document.createElement('div');
   iconRoot.id = "crx-icon-root";
   iconRoot.style.cssText = "position: absolute; top: 0px; right: -8px; z-index: 9999;";
@@ -44,18 +39,13 @@ function mountApp() {
   icon.width = 42;
 
   iconRoot.appendChild(icon);
-
   iconRoot.onclick = () => {
     if (!state.appVisible) {
       state.appVisible = true;
     }
   }
-
   const textareaElement = document.querySelector<HTMLElement>('textarea');
   textareaElement?.parentElement?.appendChild(iconRoot);
-  document.addEventListener(state.events.appVisible, () => {
-    renderApp(reactRoot, icon);
-  });
 
   // fix textarea styles injected by tailwind
   if (textareaElement) {
@@ -63,11 +53,23 @@ function mountApp() {
     textareaElement.style.fontSize = 'var(--artdeco-reset-forms-font-size)';
     textareaElement.style.lineHeight = 'inherit';
   }
+
+  let root = document.getElementById('crx-root');
+  if (root === null) {
+    root = document.createElement('div');
+    root.id = "crx-root";
+    document.body.appendChild(root);
+  }
+  const reactRoot = ReactDOM.createRoot(root);
+  document.addEventListener(state.events.appVisible, () => {
+    renderApp(reactRoot, icon);
+  });
 }
 
 function observeConnectionMsg() {
   const ADD_NOTE_BTN_QUERY = 'button[aria-label="Add a note"]';
   const addNoteBtn = document.querySelector(ADD_NOTE_BTN_QUERY);
+  const observer = new MutationObserver(onMutation);
 
   if (addNoteBtn) {
     console.log('addNoteBtn found');
@@ -76,17 +78,23 @@ function observeConnectionMsg() {
       mountApp();
     });
   } else {
-    const observer = new MutationObserver(() => {
-      const btn = document.querySelector(ADD_NOTE_BTN_QUERY);
-      if (btn) {
-        // figure out how to get icon to show up again after this observer disconnects
-        observer.disconnect();
-        btn.addEventListener('click', () => {
-          console.log("Add a note button clicked");
-          mountApp();
-        });
-      }
-    });
+    observe();
+  }
+
+  function onMutation() {
+    const btn = document.querySelector(ADD_NOTE_BTN_QUERY);
+    if (btn) {
+      observer.disconnect();
+      console.log('addNoteBtn found');
+      btn.addEventListener('click', () => {
+        console.log("Add a note button clicked");
+        mountApp();
+      });
+      observe();
+    }
+  }
+
+  function observe() {
     observer.observe(document.body, { childList: true, subtree: true });
   }
 }
