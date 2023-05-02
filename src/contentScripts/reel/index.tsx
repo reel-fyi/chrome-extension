@@ -22,7 +22,6 @@ const getUserData = () => {
         const { model, token }: { model: AuthModel, token: string } = JSON.parse(userData);
         chrome.storage.local.set({ userData: { ...model, token } });
         state.userData = { ...model, token };
-        console.log(state.userData);
     }
 };
 getUserData();

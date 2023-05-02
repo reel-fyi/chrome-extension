@@ -1,18 +1,24 @@
-import { useState } from 'react';
-import { Badge, Button } from 'flowbite-react';
+import { useEffect, useState } from 'react';
+import { Badge, Button, Spinner } from 'flowbite-react';
 import { AiOutlineClose } from 'react-icons/ai';
-import { clipboard } from '@extend-chrome/clipboard'
 import logo from '../../media/logo.svg';
 import state from '../state';
 
-const DEFAULT_MESSAGE = "Hi Zeyao, as an IU alum like yourself, I'm excited to connect with you. I'm Dake, a junior at IU and an incoming Microsoft PM intern. With my experience at a Techstars company, I'm interested in discussing product at Google and learning about your journey. Let's chat!"
-
 function App() {
-  const [message, setMessage] = useState(DEFAULT_MESSAGE);
+  const [message, setMessage] = useState("");
   const [messageCopied, setMessageCopied] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const copyText = async () => {
     await navigator.clipboard.writeText(message);
+    setMessageCopied(true);
+  }
+
+  const genMsg = async () => {
+    setIsLoading(true);
+    const msg = await state.genConnMsg();
+    setMessage(msg);
+    setIsLoading(false);
   }
 
   const copyMessageBadge = (
@@ -22,6 +28,20 @@ function App() {
       </span>
     </Badge>
   )
+
+  const loadingSpinner = (
+    <Spinner color="purple" aria-label="loading content" size='xl' />
+  )
+
+  useEffect(() => {
+    if (message.length === 0) {
+      if (state.connMsg.length > 0) {
+        setMessage(state.connMsg);
+      } else {
+        genMsg().catch(console.error);
+      }
+    }
+  }, []);
 
   return (
     <div className='bg-gray-100 rounded-lg shadow-lg'>
@@ -41,7 +61,7 @@ function App() {
         </div>
         <div className="bg-gray-200 rounded-lg p-3">
           <p className='text-lg text-gray-700'>
-            {message}
+            {isLoading ? loadingSpinner : message}
           </p>
         </div>
         <div className='flex justify-between flex-grow mt-2 gap-x-8'>
@@ -50,7 +70,7 @@ function App() {
               Copy Text
             </span>
           </Button>
-          <Button color="purple" outline fullSized>
+          <Button color="purple" outline fullSized onClick={genMsg}>
             <span className="flex items-center rounded-md text-lg px-6 py-1">
               Rewrite
             </span>

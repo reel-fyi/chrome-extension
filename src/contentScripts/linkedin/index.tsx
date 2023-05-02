@@ -11,7 +11,6 @@ let reactRoot: ReactDOM.Root;
 
 function renderApp(reactRoot: ReactDOM.Root, icon: HTMLImageElement) {
   const iconRect = icon.getBoundingClientRect();
-  console.log(iconRect);
   reactRoot.render(
     <React.StrictMode>
       <div style={
@@ -30,6 +29,12 @@ function renderApp(reactRoot: ReactDOM.Root, icon: HTMLImageElement) {
 }
 
 function mountApp() {
+  // wait for textarea to be rendered
+  let textareaElement = document.querySelector<HTMLElement>('textarea');
+  while (textareaElement === null) {
+    textareaElement = document.querySelector<HTMLElement>('textarea');
+  }
+
   const iconRoot = document.createElement('div');
   iconRoot.id = "crx-icon-root";
   iconRoot.style.cssText = "position: absolute; top: 0px; right: -8px; z-index: 9999;";
@@ -45,7 +50,6 @@ function mountApp() {
       state.appVisible = true;
     }
   }
-  const textareaElement = document.querySelector<HTMLElement>('textarea');
   textareaElement?.parentElement?.appendChild(iconRoot);
 
   // fix textarea styles injected by tailwind
@@ -73,9 +77,7 @@ function observeConnectionMsg() {
   const observer = new MutationObserver(onMutation);
 
   if (addNoteBtn) {
-    console.log('addNoteBtn found');
     addNoteBtn.addEventListener('click', () => {
-      console.log("Add a note button clicked");
       mountApp();
     });
   } else {
@@ -87,16 +89,18 @@ function observeConnectionMsg() {
     const reelIcon = document.getElementById('crx-icon-root');
     if (btn) {
       observer.disconnect();
-      console.log('addNoteBtn found');
       btn.addEventListener('click', () => {
-        console.log("Add a note button clicked");
         mountApp();
       });
       observe();
     }
 
-    if (reelIcon === null && state.appVisible) {
-      state.appVisible = false;
+    if (reelIcon === null) {
+      if (state.appVisible) {
+        state.appVisible = false;
+      }
+      // remove root, so it will need to be re-mounted
+      document.getElementById('crx-root')?.remove();
     }
   }
 
@@ -113,31 +117,33 @@ function getProfileInfo() {
   const NAME_QUERY = 'div.pv-text-details__left-panel > div > h1';
 
   // name
-  const nameEl = document.querySelector<HTMLElement>(NAME_QUERY);
-  if (nameEl) {
-    state.connectionName = nameEl.innerText;
-    console.log(state.connectionName);
+  if (state.connectionName === undefined) {
+    const nameEl = document.querySelector<HTMLElement>(NAME_QUERY);
+    if (nameEl) {
+      state.connectionName = nameEl.innerText;
+    }
   }
 
   // experience
-  const expDiv = document.querySelector(EXPERIENCE_QUERY);
-  if (expDiv) {
-    // has experiences
-    const expSec = expDiv.parentElement;
-    if (expSec) {
-      // cut off index from the text in the first experience
-      let idx = 2;
-      // check if there were many experiences at 1 company
-      if (expSec.querySelector(MANY_EXP_QUERY)) {
-        // the "timeline" effect on linkedin forces us to set this value to be at least 4
-        idx = 4;
-      }
-      const firstExp = expSec.querySelector<HTMLElement>(FIRST_EXPERIENCE_QUERY);
-      if (firstExp) {
-        const firstExpText = firstExp.outerText.split('\n');
-        const exp = Array.from(new Set(firstExpText)).slice(0, idx).join('\n');
-        state.connectionInfo = exp;
-        console.log(state.connectionInfo);
+  if (state.connectionInfo.length === 0) {
+    const expDiv = document.querySelector(EXPERIENCE_QUERY);
+    if (expDiv) {
+      // has experiences
+      const expSec = expDiv.parentElement;
+      if (expSec) {
+        // cut off index from the text in the first experience
+        let idx = 2;
+        // check if there were many experiences at 1 company
+        if (expSec.querySelector(MANY_EXP_QUERY)) {
+          // the "timeline" effect on linkedin forces us to set this value to be at least 4
+          idx = 4;
+        }
+        const firstExp = expSec.querySelector<HTMLElement>(FIRST_EXPERIENCE_QUERY);
+        if (firstExp) {
+          const firstExpText = firstExp.outerText.split('\n');
+          const exp = Array.from(new Set(firstExpText)).slice(0, idx).join('\n');
+          state.connectionInfo = exp;
+        }
       }
     }
   }
@@ -149,7 +155,6 @@ async function getUserDataFromStorage() {
     const localData = await chrome.storage.local.get('userData');
     state.userData = localData.userData as UserData;
   }
-  console.log(state.userData);
 }
 
 function cleanUpUI() {
@@ -177,9 +182,13 @@ function onLinkedInProfile() {
   return profilePageExp.test(window.location.pathname);
 }
 
-function runScript() {
+function isMissingConnDetails() {
+  return state.connectionName === undefined || state.connectionInfo.length === 0;
+}
+
+async function runScript() {
   if (onLinkedInProfile()) {
-    getUserDataFromStorage();
+    state.resetConnState();
     getProfileInfo();
     observeConnectionMsg();
   }
@@ -194,10 +203,16 @@ const observePage = () => {
       runScript();
     } else {
       cleanUpUI();
+      // in case profile info was not obtained
+      if (onLinkedInProfile() && isMissingConnDetails()) {
+        getProfileInfo();
+      }
     }
   });
   observer.observe(document.body, { childList: true, subtree: true });
 }
 
+// when content script is injected into webpage (first time)
+getUserDataFromStorage();
 runScript();
 observePage();
