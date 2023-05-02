@@ -23,5 +23,8 @@
   "host_permissions": ["*://*.linkedin.com/*", "*://*.reel.fyi/*"],
   "externally_connectable": {
     "matches": ["*://*.reel.fyi/*"]
+  },
+  "background": {
+    "service_worker": "src/background/index.ts"
   }
 }
