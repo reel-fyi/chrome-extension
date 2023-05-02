@@ -17,8 +17,10 @@ function App() {
   const genMsg = async () => {
     setIsLoading(true);
     const msg = await state.genConnMsg();
-    setMessage(msg);
-    setIsLoading(false);
+    if (msg.length > 0) {
+      setMessage(msg);
+      setIsLoading(false);
+    }
   }
 
   const copyMessageBadge = (
