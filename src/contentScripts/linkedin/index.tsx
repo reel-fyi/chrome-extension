@@ -4,6 +4,8 @@ import App from './App'
 import '../../index.css'
 import logo from '../../media/logo.svg';
 import state from '../state';
+import mixpanel from 'mixpanel-browser';
+import { MIXPANEL_PROJECT_TOKEN } from '../../config/config';
 
 type UserData = typeof state.userData;
 const profilePageExp = /^\/in\//;
@@ -48,6 +50,7 @@ function mountApp() {
   iconRoot.onclick = () => {
     if (!state.appVisible) {
       state.appVisible = true;
+      mixpanel.track('extension_linkedin_open');
     }
   }
   textareaElement?.parentElement?.appendChild(iconRoot);
@@ -212,7 +215,17 @@ const observePage = () => {
   observer.observe(document.body, { childList: true, subtree: true });
 }
 
+function initAnalytics() {
+  if (state.userData) {
+    mixpanel.init(MIXPANEL_PROJECT_TOKEN);
+    mixpanel.identify(state.userData.id);
+  }
+}
+
 // when content script is injected into webpage (first time)
-getUserDataFromStorage();
-runScript();
-observePage();
+(async () => {
+  await getUserDataFromStorage();
+  initAnalytics();
+  runScript();
+  observePage();
+})();

@@ -3,6 +3,7 @@ import { Badge, Button, Spinner } from 'flowbite-react';
 import { AiOutlineClose } from 'react-icons/ai';
 import logo from '../../media/logo.svg';
 import state from '../state';
+import mixpanel from 'mixpanel-browser';
 
 function App() {
   const [message, setMessage] = useState("");
@@ -12,6 +13,12 @@ function App() {
   const copyText = async () => {
     await navigator.clipboard.writeText(message);
     setMessageCopied(true);
+    mixpanel.track('extension_copy');
+  }
+
+  const rewrite = async () => {
+    mixpanel.track('extension_rewrite');
+    await genMsg();
   }
 
   const genMsg = async () => {
@@ -72,7 +79,7 @@ function App() {
               Copy Text
             </span>
           </Button>
-          <Button color="purple" outline fullSized onClick={genMsg}>
+          <Button color="purple" outline fullSized onClick={rewrite}>
             <span className="flex items-center rounded-md text-lg px-6 py-1">
               Rewrite
             </span>
