@@ -5,23 +5,39 @@ import logo from '../../media/logo.svg';
 import state from '../state';
 import mixpanel from 'mixpanel-browser';
 
+type MsgProperty = {
+  msg: string[],
+}
+
 function App() {
   const [message, setMessage] = useState("");
   const [messageCopied, setMessageCopied] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
+  function constructMsgProperty(): MsgProperty {
+    const property: MsgProperty = {
+      msg: [
+        message.slice(0, 255),
+        message.slice(255),
+      ]
+    };
+
+    return property;
+  }
+
   const copyText = async () => {
     await navigator.clipboard.writeText(message);
     setMessageCopied(true);
-    mixpanel.track('extension_copy');
+    mixpanel.track('extension_copy', constructMsgProperty());
   }
 
   const rewrite = async () => {
-    mixpanel.track('extension_rewrite');
+    mixpanel.track('extension_rewrite', constructMsgProperty());
     await genMsg();
   }
 
   const genMsg = async () => {
+    setMessageCopied(false);
     setIsLoading(true);
     const msg = await state.genConnMsg();
     if (msg.length > 0) {
