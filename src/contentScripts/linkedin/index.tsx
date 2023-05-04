@@ -171,6 +171,12 @@ function cleanUpUI() {
     }
   });
 
+  const SECONDARY_BTN_QUERY = '.artdeco-button--secondary';
+  const secondaryBtn = document.querySelectorAll<HTMLElement>(SECONDARY_BTN_QUERY);
+  secondaryBtn.forEach(btn => {
+    btn.style.backgroundColor = 'var(--color-background-none)';
+  });
+
   const SEARCH_ICON_QUERY = '.search-global-typeahead__search-icon';
   const searchIcon = document.querySelector<HTMLElement>(SEARCH_ICON_QUERY);
   if (searchIcon) {
