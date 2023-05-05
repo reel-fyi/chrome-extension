@@ -20,11 +20,7 @@
     "48": "icons/icon48.png",
     "128": "icons/icon128.png"
   },
-  "permissions": ["activeTab", "scripting", "clipboardWrite", "storage"],
-  "host_permissions": ["*://*.linkedin.com/*", "*://*.reel.fyi/*"],
-  "externally_connectable": {
-    "matches": ["*://*.reel.fyi/*"]
-  },
+  "permissions": ["activeTab", "clipboardWrite", "storage"],
   "background": {
     "service_worker": "src/background/index.ts"
   }
