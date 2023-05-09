@@ -24,4 +24,12 @@ const getUserData = () => {
         state.userData = { ...model, token };
     }
 };
+
+window.addEventListener('message', (event) => {
+    if (event.source !== window) return;
+    if (event.data.type && (event.data.type === 'UPDATE_PROFILE')) {
+        getUserData();
+    }
+});
+
 getUserData();
