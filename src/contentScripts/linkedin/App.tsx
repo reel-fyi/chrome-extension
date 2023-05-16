@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
-import { Badge, Button, Spinner } from 'flowbite-react';
+import { Alert, Badge, Button, Spinner } from 'flowbite-react';
 import { AiOutlineClose } from 'react-icons/ai';
+import { HiInformationCircle } from 'react-icons/hi';
 import logo from '../../media/logo.svg';
 import state from '../state';
 import mixpanel from 'mixpanel-browser';
@@ -54,16 +55,32 @@ function App() {
     </Badge>
   )
 
+  const noBioAlert = (
+    <Alert color="failure" icon={HiInformationCircle}>
+      <h3 className='text-red-700 text-lg'>
+        <span className="font-medium">
+          Please add a bio to your profile.
+        </span>
+        {'\n'}
+        <a href="https://app.reel.fyi/dashboard#bio" target='_blank' className='underline font-semibold text-red-700 visited:text-red-700 hover:text-red-400 hover:visited:text-red-400 focus:text-red-700 focus:hover:text-red-700'>
+          Click here to add one
+        </a>
+      </h3>
+    </Alert>
+  )
+
   const loadingSpinner = (
     <Spinner color="purple" aria-label="loading content" size='xl' />
   )
 
   useEffect(() => {
-    if (message.length === 0) {
-      if (state.connMsg.length > 0) {
-        setMessage(state.connMsg);
-      } else {
-        genMsg().catch(console.error);
+    if (state.userData && state.userData.bio.length > 0) {
+      if (message.length === 0) {
+        if (state.connMsg.length > 0) {
+          setMessage(state.connMsg);
+        } else {
+          genMsg().catch(console.error);
+        }
       }
     }
   }, []);
@@ -80,27 +97,29 @@ function App() {
             <AiOutlineClose className='fill-gray-800' />
           </button>
         </div>
-        <div className='flex items-center justify-between'>
-          <h4 className='text-gray-800 text-xl font-light'>Your message:</h4>
-          {messageCopied && copyMessageBadge}
-        </div>
-        <div className="bg-gray-200 rounded-lg p-3">
-          <p className='text-lg text-gray-700'>
-            {isLoading ? loadingSpinner : message}
-          </p>
-        </div>
-        <div className='flex justify-between flex-grow mt-2 gap-x-8'>
-          <Button color="purple" fullSized onClick={copyText}>
-            <span className="flex items-center rounded-md text-lg px-6 py-1">
-              Copy Text
-            </span>
-          </Button>
-          <Button color="purple" outline fullSized onClick={rewrite}>
-            <span className="flex items-center rounded-md text-lg px-6 py-1">
-              Rewrite
-            </span>
-          </Button>
-        </div>
+        {state.userData?.bio.length === 0 ? noBioAlert : <>
+          <div className='flex items-center justify-between'>
+            <h4 className='text-gray-800 text-xl font-light'>Your message:</h4>
+            {messageCopied && copyMessageBadge}
+          </div>
+          <div className="bg-gray-200 rounded-lg p-3">
+            <p className='text-lg text-gray-700'>
+              {isLoading ? loadingSpinner : message}
+            </p>
+          </div>
+          <div className='flex justify-between flex-grow mt-2 gap-x-8'>
+            <Button color="purple" fullSized onClick={copyText}>
+              <span className="flex items-center rounded-md text-lg px-6 py-1">
+                Copy Text
+              </span>
+            </Button>
+            <Button color="purple" outline fullSized onClick={rewrite}>
+              <span className="flex items-center rounded-md text-lg px-6 py-1">
+                Rewrite
+              </span>
+            </Button>
+          </div>
+        </>}
       </div>
     </div>
   );

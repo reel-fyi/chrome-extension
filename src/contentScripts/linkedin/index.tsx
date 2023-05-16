@@ -222,10 +222,13 @@ const observePage = () => {
 }
 
 function initAnalytics() {
-  if (state.userData) {
-    mixpanel.init(MIXPANEL_PROJECT_TOKEN);
-    mixpanel.identify(state.userData.id);
-  }
+  mixpanel.init(MIXPANEL_PROJECT_TOKEN, {
+    loaded: () => {
+      if (state.userData && mixpanel.get_distinct_id() !== state.userData.id) {
+        mixpanel.identify(state.userData.id);
+      }
+    },
+  });
 }
 
 // when content script is injected into webpage (first time)
